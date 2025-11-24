@@ -60,6 +60,9 @@
             height: 80px;
             perspective: 600px;
             margin: 0 auto 20px auto;
+            /* FIX: Create a new stacking context to prevent Z-fighting glitches */
+            isolation: isolate; 
+            z-index: 10;
         }
         .cube-3d {
             width: 100%;
@@ -67,6 +70,8 @@
             position: relative;
             transform-style: preserve-3d;
             animation: spin3D 8s infinite linear;
+            /* FIX: Tell browser to optimize for transform changes */
+            will-change: transform; 
         }
         .face {
             position: absolute;
@@ -74,13 +79,14 @@
             height: 80px;
             background: white;
             border: 2px solid #94a3b8;
-            /* border-radius: 12px; REMOVED for solid corners */
+            /* No border-radius for solid 3D look */
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
             padding: 4px;
             gap: 2px;
-            /* opacity: 0.95; REMOVED for solid look */
             backface-visibility: hidden; /* Hides back faces for a solid look */
+            /* FIX: Force hardware acceleration for each face */
+            transform: translateZ(0); 
         }
         /* Face positioning */
         .face-front  { transform: rotateY(  0deg) translateZ(40px); }
