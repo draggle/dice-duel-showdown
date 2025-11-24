@@ -60,9 +60,9 @@
             height: 80px;
             perspective: 600px;
             margin: 0 auto 20px auto;
-            /* FIX: Create a new stacking context to prevent Z-fighting glitches */
-            isolation: isolate; 
             z-index: 10;
+            /* FIX: Removed isolation and added GPU force */
+            transform: translate3d(0,0,0);
         }
         .cube-3d {
             width: 100%;
@@ -70,8 +70,7 @@
             position: relative;
             transform-style: preserve-3d;
             animation: spin3D 8s infinite linear;
-            /* FIX: Tell browser to optimize for transform changes */
-            will-change: transform; 
+            /* FIX: Removed will-change to stop flickering */
         }
         .face {
             position: absolute;
