@@ -42,7 +42,6 @@ This repository contains three implementations of the game logic, demonstrating 
 
 **Python Version:**
 ```bash
-cd python-version
 python dice_duel.py
 ```
 
