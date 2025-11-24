@@ -44,11 +44,11 @@ This repository contains three implementations of the game logic, demonstrating 
 ```bash
 cd python-version
 python dice_duel.py
-
+```
 
 **Java Version:**
 ```bash
 javac GameRunner.java
 java GameRunner
-
+```
 Author: Ayan Bin Saif
