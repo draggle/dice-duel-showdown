@@ -54,27 +54,25 @@
             100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* --- 3D CUBE STYLING (FIXED) --- */
-        /* New Wrapper to contain the 3D context strictly */
+        /* --- 3D CUBE STYLING (FINAL FIX) --- */
+        /* Use a flexible wrapper to prevent clipping */
         .scene-wrapper {
-            width: 100px;
-            height: 100px;
+            width: 120px; /* Increased width */
+            height: 120px; /* Increased height */
             margin: 0 auto 10px auto;
-            /* This cuts off any glitching artifacts that try to escape */
-            overflow: hidden; 
+            /* REMOVED overflow: hidden to stop cropping */
             display: flex;
             align-items: center;
             justify-content: center;
+            z-index: 20;
+            position: relative;
         }
 
         .scene-3d {
             width: 80px;
             height: 80px;
             perspective: 600px;
-            /* Isolate stacking context */
-            isolation: isolate; 
             position: relative;
-            z-index: 1;
         }
 
         .cube-3d {
@@ -91,14 +89,15 @@
             height: 80px;
             background: white;
             border: 2px solid #94a3b8;
+            /* No border-radius to ensure solid edges */
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
             padding: 4px;
             gap: 2px;
-            /* Backface visibility hidden helps performance and visual clarity */
+            /* Essential for performance and hiding backside artifacts */
             backface-visibility: hidden;
-            /* Force GPU hardware acceleration */
-            transform: translateZ(0); 
+            /* Force hardware acceleration on each face */
+            transform: translateZ(0);
         }
         
         .face-front  { transform: rotateY(  0deg) translateZ(40px); }
@@ -116,6 +115,9 @@
         /* General UI */
         .screen { display: none; }
         .screen.active { display: flex; }
+
+        /* FIX: Apply translateZ(0) to the main menu container to prevent Z-fighting */
+        #menuScreen { transform: translateZ(0); }
 
         .log-container { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
         .log-container::-webkit-scrollbar { width: 8px; }
