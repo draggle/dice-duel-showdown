@@ -21,7 +21,7 @@
             width: 60px;
             height: 60px;
             background: white;
-            border-radius: 12px; /* Kept rounded corners for 2D game dice */
+            border-radius: 12px;
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
             padding: 4px;
@@ -54,15 +54,14 @@
             100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* --- 3D CUBE STYLING (For Menu Logo) --- */
+        /* --- 3D CUBE STYLING (Corrected) --- */
         .scene-3d {
             width: 80px;
             height: 80px;
             perspective: 600px;
             margin: 0 auto 20px auto;
-            z-index: 10;
-            /* FIX: Removed isolation and added GPU force */
-            transform: translate3d(0,0,0);
+            position: relative;
+            z-index: 1; /* Lower z-index to prevent overlay issues */
         }
         .cube-3d {
             width: 100%;
@@ -70,7 +69,6 @@
             position: relative;
             transform-style: preserve-3d;
             animation: spin3D 8s infinite linear;
-            /* FIX: Removed will-change to stop flickering */
         }
         .face {
             position: absolute;
@@ -78,16 +76,15 @@
             height: 80px;
             background: white;
             border: 2px solid #94a3b8;
-            /* No border-radius for solid 3D look */
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
             padding: 4px;
             gap: 2px;
-            backface-visibility: hidden; /* Hides back faces for a solid look */
-            /* FIX: Force hardware acceleration for each face */
-            transform: translateZ(0); 
+            backface-visibility: hidden;
+            /* Crucial fix: Ensure faces don't leak their render box */
+            box-sizing: border-box; 
         }
-        /* Face positioning */
+        
         .face-front  { transform: rotateY(  0deg) translateZ(40px); }
         .face-right  { transform: rotateY( 90deg) translateZ(40px); }
         .face-back   { transform: rotateY(180deg) translateZ(40px); }
