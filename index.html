@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dice Duel Showdown: FIFTY or BUST</title>
+    
+    <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
@@ -13,12 +16,12 @@
         body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: white; }
         h1, h2, h3 { font-family: 'Righteous', cursive; }
         
-        /* Dice Styling */
+        /* --- 2D Dice Styling (For Gameplay) --- */
         .dice {
             width: 60px;
             height: 60px;
             background: white;
-            border-radius: 12px;
+            border-radius: 12px; /* Kept rounded corners for 2D game dice */
             display: grid;
             grid-template: repeat(3, 1fr) / repeat(3, 1fr);
             padding: 4px;
@@ -26,17 +29,23 @@
             box-shadow: inset 0 0 5px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
             transition: transform 0.3s;
         }
-        .dot { background: #1e293b; border-radius: 50%; display: block; }
+        .dot { background: #1e293b; border-radius: 50%; display: block; opacity: 0; }
         
-        /* Dice Dot Positions */
+        /* Dice Logic (Which dots to show) */
+        .d-show-1 .dot:nth-child(5) { opacity: 1; }
+        .d-show-2 .dot:nth-child(1), .d-show-2 .dot:nth-child(9) { opacity: 1; }
+        .d-show-3 .dot:nth-child(1), .d-show-3 .dot:nth-child(5), .d-show-3 .dot:nth-child(9) { opacity: 1; }
+        .d-show-4 .dot:nth-child(1), .d-show-4 .dot:nth-child(3), .d-show-4 .dot:nth-child(7), .d-show-4 .dot:nth-child(9) { opacity: 1; }
+        .d-show-5 .dot:nth-child(1), .d-show-5 .dot:nth-child(3), .d-show-5 .dot:nth-child(5), .d-show-5 .dot:nth-child(7), .d-show-5 .dot:nth-child(9) { opacity: 1; }
+        .d-show-6 .dot:nth-child(1), .d-show-6 .dot:nth-child(3), .d-show-6 .dot:nth-child(4), .d-show-6 .dot:nth-child(6), .d-show-6 .dot:nth-child(7), .d-show-6 .dot:nth-child(9) { opacity: 1; }
+
+        /* Apply these classes dynamically for game dice */
         .dice[data-val="1"] .dot:nth-child(5) { opacity: 1; }
         .dice[data-val="2"] .dot:nth-child(1), .dice[data-val="2"] .dot:nth-child(9) { opacity: 1; }
         .dice[data-val="3"] .dot:nth-child(1), .dice[data-val="3"] .dot:nth-child(5), .dice[data-val="3"] .dot:nth-child(9) { opacity: 1; }
         .dice[data-val="4"] .dot:nth-child(1), .dice[data-val="4"] .dot:nth-child(3), .dice[data-val="4"] .dot:nth-child(7), .dice[data-val="4"] .dot:nth-child(9) { opacity: 1; }
         .dice[data-val="5"] .dot:nth-child(1), .dice[data-val="5"] .dot:nth-child(3), .dice[data-val="5"] .dot:nth-child(5), .dice[data-val="5"] .dot:nth-child(7), .dice[data-val="5"] .dot:nth-child(9) { opacity: 1; }
         .dice[data-val="6"] .dot:nth-child(1), .dice[data-val="6"] .dot:nth-child(3), .dice[data-val="6"] .dot:nth-child(4), .dice[data-val="6"] .dot:nth-child(6), .dice[data-val="6"] .dot:nth-child(7), .dice[data-val="6"] .dot:nth-child(9) { opacity: 1; }
-        
-        .dot { opacity: 0; } 
 
         .roll-anim { animation: roll 0.5s ease-out; }
         @keyframes roll {
@@ -45,37 +54,59 @@
             100% { transform: rotate(360deg) scale(1); }
         }
 
+        /* --- 3D CUBE STYLING (For Menu Logo) --- */
+        .scene-3d {
+            width: 80px;
+            height: 80px;
+            perspective: 600px;
+            margin: 0 auto 20px auto;
+        }
+        .cube-3d {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            animation: spin3D 8s infinite linear;
+        }
+        .face {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: white;
+            border: 2px solid #94a3b8;
+            /* border-radius: 12px; REMOVED for solid corners */
+            display: grid;
+            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+            padding: 4px;
+            gap: 2px;
+            /* opacity: 0.95; REMOVED for solid look */
+            backface-visibility: hidden; /* Hides back faces for a solid look */
+        }
+        /* Face positioning */
+        .face-front  { transform: rotateY(  0deg) translateZ(40px); }
+        .face-right  { transform: rotateY( 90deg) translateZ(40px); }
+        .face-back   { transform: rotateY(180deg) translateZ(40px); }
+        .face-left   { transform: rotateY(-90deg) translateZ(40px); }
+        .face-top    { transform: rotateX( 90deg) translateZ(40px); }
+        .face-bottom { transform: rotateX(-90deg) translateZ(40px); }
+
+        @keyframes spin3D {
+            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
+            100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); }
+        }
+
+        /* General UI */
         .screen { display: none; }
         .screen.active { display: flex; }
 
-        /* Enhanced Log Styling */
-        .log-container {
-            scrollbar-width: thin;
-            scrollbar-color: #475569 #1e293b;
-        }
+        .log-container { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
         .log-container::-webkit-scrollbar { width: 8px; }
         .log-container::-webkit-scrollbar-track { background: #1e293b; }
         .log-container::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 20px; }
 
-        .log-entry {
-            animation: slideIn 0.3s ease-out;
-            margin-bottom: 8px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border-left-width: 4px;
-        }
-        
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateX(-10px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
+        .log-entry { animation: slideIn 0.3s ease-out; margin-bottom: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border-left-width: 4px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        /* Log Categories */
         .log-player { background: rgba(37, 99, 235, 0.15); border-color: #3b82f6; }
         .log-computer { background: rgba(220, 38, 38, 0.15); border-color: #ef4444; }
         .log-system { background: rgba(100, 116, 139, 0.15); border-color: #94a3b8; color: #cbd5e1; font-style: italic; }
@@ -92,6 +123,49 @@
 
     <!-- MENU SCREEN -->
     <div id="menuScreen" class="screen active flex-col items-center gap-6 w-full max-w-md p-6">
+        
+        <!-- 3D DICE LOGO -->
+        <div class="scene-3d">
+            <div class="cube-3d">
+                <!-- Front (1) -->
+                <div class="face face-front d-show-1">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <!-- Back (6) -->
+                <div class="face face-back d-show-6">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <!-- Right (3) -->
+                <div class="face face-right d-show-3">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <!-- Left (4) -->
+                <div class="face face-left d-show-4">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <!-- Top (5) -->
+                <div class="face face-top d-show-5">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+                <!-- Bottom (2) -->
+                <div class="face face-bottom d-show-2">
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                    <span class="dot"></span><span class="dot"></span><span class="dot"></span>
+                </div>
+            </div>
+        </div>
+
         <h1 class="text-5xl text-yellow-400 text-center drop-shadow-lg mb-4">DICE DUEL<br><span class="text-3xl text-white">Showdown</span></h1>
         <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full border border-slate-700 flex flex-col gap-4">
             <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-xl transition shadow-lg transform active:scale-95">
@@ -146,13 +220,13 @@
             <div id="turnIndicator" class="absolute top-4 bg-blue-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse">Your Turn</div>
             
             <div class="flex gap-6 mb-8">
-                <!-- Die 1 -->
+                <!-- Die 1 (Game 2D Dice) -->
                 <div id="die1" class="dice" data-val="1">
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                 </div>
-                <!-- Die 2 -->
+                <!-- Die 2 (Game 2D Dice) -->
                 <div id="die2" class="dice" data-val="1">
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                     <span class="dot"></span><span class="dot"></span><span class="dot"></span>
