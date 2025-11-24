@@ -6,7 +6,7 @@ Dice Duel Showdown is a strategic, turn-based dice game where a player competes 
 This repository contains three implementations of the game logic, demonstrating proficiency in **Web Development**, **Python scripting**, and **Object-Oriented Java programming**.
 
 ## 🎮 Play the Web Version
-**[Click Here to Play the Game Online](https://draggle.github.io/dice-duel-showdown/web-app/)**
+**[Click Here to Play the Game Online](https://draggle.github.io/dice-duel-showdown/)**
 
 ## Features & Rules
 * **Objective:** Reach 50 points. Exact 50 wins instantly. Over 50 loses instantly.
