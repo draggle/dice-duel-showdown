@@ -4,23 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dice Duel Showdown: FIFTY or BUST</title>
+    
     <!-- Favicon -->
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🎲%3C/text%3E%3C/svg%3E">
+
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Righteous&family=Roboto:wght@400;500;700&display=swap');
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #0f172a;
-            color: white;
-        }
-
-        h1, h2, h3 {
-            font-family: 'Righteous', cursive;
-        }
-
+        
+        body { font-family: 'Roboto', sans-serif; background-color: #0f172a; color: white; }
+        h1, h2, h3 { font-family: 'Righteous', cursive; }
+        
         /* --- 2D Dice Styling (For Gameplay) --- */
         .dice {
             width: 60px;
@@ -34,14 +29,8 @@
             box-shadow: inset 0 0 5px rgba(0,0,0,0.5), 0 5px 10px rgba(0,0,0,0.3);
             transition: transform 0.3s;
         }
-
-        .dot {
-            background: #1e293b;
-            border-radius: 50%;
-            display: block;
-            opacity: 0;
-        }
-
+        .dot { background: #1e293b; border-radius: 50%; display: block; opacity: 0; }
+        
         /* Dice Logic (Which dots to show) */
         .d-show-1 .dot:nth-child(5) { opacity: 1; }
         .d-show-2 .dot:nth-child(1), .d-show-2 .dot:nth-child(9) { opacity: 1; }
@@ -58,157 +47,46 @@
         .dice[data-val="5"] .dot:nth-child(1), .dice[data-val="5"] .dot:nth-child(3), .dice[data-val="5"] .dot:nth-child(5), .dice[data-val="5"] .dot:nth-child(7), .dice[data-val="5"] .dot:nth-child(9) { opacity: 1; }
         .dice[data-val="6"] .dot:nth-child(1), .dice[data-val="6"] .dot:nth-child(3), .dice[data-val="6"] .dot:nth-child(4), .dice[data-val="6"] .dot:nth-child(6), .dice[data-val="6"] .dot:nth-child(7), .dice[data-val="6"] .dot:nth-child(9) { opacity: 1; }
 
-        .roll-anim {
-            animation: roll 0.5s ease-out;
-        }
-
+        .roll-anim { animation: roll 0.5s ease-out; }
         @keyframes roll {
             0% { transform: rotate(0deg) scale(1); }
             50% { transform: rotate(180deg) scale(1.1); }
             100% { transform: rotate(360deg) scale(1); }
         }
 
-        /* --- 3D CUBE STYLING (FIXED) --- */
-        .scene-wrapper {
+        /* --- MENU LOGO STYLING (SVG) --- */
+        .menu-logo-container {
             width: 120px;
             height: 120px;
             margin: 0 auto 10px auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 20;
-            position: relative;
+            animation: float 3s ease-in-out infinite;
         }
-
-        .scene-3d {
-            width: 80px;
-            height: 80px;
-            perspective: 600px;
-            position: relative;
-        }
-
-        .cube-3d {
-            width: 100%;
-            height: 100%;
-            position: relative;
-            transform-style: preserve-3d;
-            animation: spin3D 8s infinite linear;
-        }
-
-        .face {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: white;
-            border: 2px solid #334155;
-            display: grid;
-            grid-template: repeat(3, 1fr) / repeat(3, 1fr);
-            padding: 4px;
-            gap: 2px;
-            backface-visibility: hidden;
-            -webkit-backface-visibility: hidden;
-            transform: translateZ(0);
-            transform-style: preserve-3d;
-            will-change: transform;
-        }
-
-        .face-front  { transform: rotateY(  0deg) translateZ(40.5px); }
-        .face-right  { transform: rotateY( 90deg) translateZ(40.5px); }
-        .face-back   { transform: rotateY(180deg) translateZ(40.5px); }
-        .face-left   { transform: rotateY(-90deg) translateZ(40.5px); }
-        .face-top    { transform: rotateX( 90deg) translateZ(40.5px); }
-        .face-bottom { transform: rotateX(-90deg) translateZ(40.5px); }
-
-        @keyframes spin3D {
-            0% { transform: rotateX(0deg) rotateY(0deg) rotateZ(0deg); }
-            100% { transform: rotateX(360deg) rotateY(720deg) rotateZ(360deg); }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
         }
 
         /* General UI */
-        .screen {
-            display: none;
-        }
+        .screen { display: none; }
+        .screen.active { display: flex; }
 
-        .screen.active {
-            display: flex;
-        }
+        .log-container { scrollbar-width: thin; scrollbar-color: #475569 #1e293b; }
+        .log-container::-webkit-scrollbar { width: 8px; }
+        .log-container::-webkit-scrollbar-track { background: #1e293b; }
+        .log-container::-webkit-scrollbar-thumb { background-color: #475569; border-radius: 20px; }
 
-        #menuScreen {
-            transform: translateZ(0);
-        }
+        .log-entry { animation: slideIn 0.3s ease-out; margin-bottom: 8px; padding: 10px 14px; border-radius: 8px; font-size: 0.9rem; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); border-left-width: 4px; }
+        @keyframes slideIn { from { opacity: 0; transform: translateX(-10px); } to { opacity: 1; transform: translateX(0); } }
 
-        .log-container {
-            scrollbar-width: thin;
-            scrollbar-color: #475569 #1e293b;
-        }
-
-        .log-container::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        .log-container::-webkit-scrollbar-track {
-            background: #1e293b;
-        }
-
-        .log-container::-webkit-scrollbar-thumb {
-            background-color: #475569;
-            border-radius: 20px;
-        }
-
-        .log-entry {
-            animation: slideIn 0.3s ease-out;
-            margin-bottom: 8px;
-            padding: 10px 14px;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-            border-left-width: 4px;
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateX(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
-        }
-
-        .log-player {
-            background: rgba(37, 99, 235, 0.15);
-            border-color: #3b82f6;
-        }
-
-        .log-computer {
-            background: rgba(220, 38, 38, 0.15);
-            border-color: #ef4444;
-        }
-
-        .log-system {
-            background: rgba(100, 116, 139, 0.15);
-            border-color: #94a3b8;
-            color: #cbd5e1;
-            font-style: italic;
-        }
-
-        .log-highlight {
-            background: rgba(234, 179, 8, 0.15);
-            border-color: #eab308;
-            color: #fef08a;
-            font-weight: bold;
-        }
-
-        .log-bad {
-            background: rgba(239, 68, 68, 0.25);
-            border-color: #b91c1c;
-            color: #fecaca;
-            font-weight: bold;
-        }
+        .log-player { background: rgba(37, 99, 235, 0.15); border-color: #3b82f6; }
+        .log-computer { background: rgba(220, 38, 38, 0.15); border-color: #ef4444; }
+        .log-system { background: rgba(100, 116, 139, 0.15); border-color: #94a3b8; color: #cbd5e1; font-style: italic; }
+        .log-highlight { background: rgba(234, 179, 8, 0.15); border-color: #eab308; color: #fef08a; font-weight: bold; }
+        .log-bad { background: rgba(239, 68, 68, 0.25); border-color: #b91c1c; color: #fecaca; font-weight: bold; }
+        
+        /* Disable interactions when processing */
+        .processing { pointer-events: none; opacity: 0.7; }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex items-center justify-center relative">
@@ -220,52 +98,56 @@
 
     <!-- MENU SCREEN -->
     <div id="menuScreen" class="screen active flex-col items-center gap-6 w-full max-w-md p-6">
-        <!-- 3D DICE LOGO -->
-        <div class="scene-wrapper">
-            <div class="scene-3d">
-                <div class="cube-3d">
-                    <!-- Front (1) -->
-                    <div class="face face-front d-show-1">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                    <!-- Back (6) -->
-                    <div class="face face-back d-show-6">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                    <!-- Right (3) -->
-                    <div class="face face-right d-show-3">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                    <!-- Left (4) -->
-                    <div class="face face-left d-show-4">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                    <!-- Top (5) -->
-                    <div class="face face-top d-show-5">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                    <!-- Bottom (2) -->
-                    <div class="face face-bottom d-show-2">
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                        <span class="dot"></span><span class="dot"></span><span class="dot"></span>
-                    </div>
-                </div>
-            </div>
+        
+        <!-- STATIC 3D SVG LOGO -->
+        <div class="menu-logo-container">
+            <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="none">
+                <defs>
+                    <filter id="dropShadow" x="-20%" y="-20%" width="140%" height="140%">
+                        <feGaussianBlur in="SourceAlpha" stdDeviation="2"/>
+                        <feOffset dx="0" dy="2" result="offsetblur"/>
+                        <feComponentTransfer>
+                            <feFuncA type="linear" slope="0.3"/>
+                        </feComponentTransfer>
+                        <feMerge> 
+                            <feMergeNode/>
+                            <feMergeNode in="SourceGraphic"/>
+                        </feMerge>
+                    </filter>
+                </defs>
+
+                <!-- Shadow under the cube -->
+                <ellipse cx="50" cy="92" rx="30" ry="5" fill="black" opacity="0.3" />
+                
+                <g filter="url(#dropShadow)">
+                    <!-- Cube Base Shape (Iso-metric view) -->
+                    <!-- Left Face -->
+                    <path d="M15 35 L50 55 L50 95 L15 75 Z" fill="#e2e8f0" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Right Face -->
+                    <path d="M85 35 L85 75 L50 95 L50 55 Z" fill="#cbd5e1" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Top Face -->
+                    <path d="M50 15 L85 35 L50 55 L15 35 Z" fill="#ffffff" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+
+                    <!-- Dots (Top - 5) -->
+                    <circle cx="50" cy="35" r="3.5" fill="#1e293b"/>
+                    <circle cx="32" cy="25" r="3.5" fill="#1e293b"/>
+                    <circle cx="68" cy="45" r="3.5" fill="#1e293b"/>
+                    <circle cx="68" cy="25" r="3.5" fill="#1e293b"/>
+                    <circle cx="32" cy="45" r="3.5" fill="#1e293b"/>
+
+                    <!-- Dots (Left - 3) -->
+                    <circle cx="32.5" cy="55" r="3" fill="#1e293b" transform="rotate(-30 32.5 55)"/>
+                    <circle cx="32.5" cy="65" r="3" fill="#1e293b" transform="rotate(-30 32.5 65)"/>
+                    <circle cx="32.5" cy="75" r="3" fill="#1e293b" transform="rotate(-30 32.5 75)"/>
+
+                    <!-- Dots (Right - 2) -->
+                    <circle cx="67.5" cy="55" r="3" fill="#1e293b" transform="rotate(30 67.5 55)"/>
+                    <circle cx="67.5" cy="75" r="3" fill="#1e293b" transform="rotate(30 67.5 75)"/>
+                </g>
+            </svg>
         </div>
 
         <h1 class="text-5xl text-yellow-400 text-center drop-shadow-lg mb-4">DICE DUEL<br><span class="text-3xl text-white">Showdown</span></h1>
-
         <div class="bg-slate-800 p-8 rounded-2xl shadow-2xl w-full border border-slate-700 flex flex-col gap-4">
             <button onclick="startGame()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-4 rounded-xl text-xl transition shadow-lg transform active:scale-95">
                 <i class="fas fa-play mr-2"></i> Play Game
@@ -274,7 +156,6 @@
                 <i class="fas fa-book mr-2"></i> How To Play
             </button>
         </div>
-
         <p class="text-slate-500 text-sm">Target: 50 Points • 10 Rounds</p>
     </div>
 
@@ -295,6 +176,7 @@
 
     <!-- GAME SCREEN -->
     <div id="gameScreen" class="screen flex-col w-full max-w-2xl p-4 h-full max-h-[900px]">
+        
         <!-- Header / Scoreboard -->
         <div class="flex justify-between items-center bg-slate-800 p-4 rounded-xl border border-slate-700 mb-4 shadow-lg">
             <div class="text-center w-1/3">
@@ -317,7 +199,7 @@
         <!-- Dice Arena -->
         <div class="flex-1 bg-slate-900/50 rounded-xl border border-slate-700 relative flex flex-col items-center justify-center mb-4 p-8">
             <div id="turnIndicator" class="absolute top-4 bg-blue-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse">Your Turn</div>
-
+            
             <div class="flex gap-6 mb-8">
                 <!-- Die 1 (Game 2D Dice) -->
                 <div id="die1" class="dice" data-val="1">
@@ -344,7 +226,7 @@
         </div>
 
         <!-- Game Log -->
-        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 h-48 flex flex-col relative">
+        <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 h-48 flex flex-col relative" >
             <div class="absolute top-2 right-4 text-xs text-slate-500 uppercase font-bold tracking-wider">Battle Log</div>
             <div id="gameLog" class="log-container overflow-y-auto flex-1 pr-2 flex flex-col-reverse mt-6">
                 <!-- Log entries go here -->
@@ -387,96 +269,145 @@
         </div>
     </div>
 
-    <script>
-        // --- SOUND ENGINE (Web Audio API) ---
-        const Sound = {
-            ctx: null,
-            isMuted: false,
+<script>
+    // --- SOUND ENGINE (Web Audio API) ---
+    const Sound = {
+        ctx: null,
+        isMuted: false,
 
-            init: function() {
-                if (!this.ctx) {
-                    this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-                }
-                if (this.ctx.state === 'suspended') {
-                    this.ctx.resume();
-                }
-            },
-
-            playTone: function(freq, type, duration, vol=0.1) {
-                if (this.isMuted || !this.ctx) return;
-                const osc = this.ctx.createOscillator();
-                const gain = this.ctx.createGain();
-                osc.type = type;
-                osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-                osc.connect(gain);
-                gain.connect(this.ctx.destination);
-                osc.start();
-                osc.stop(this.ctx.currentTime + duration);
-            },
-
-            playNoise: function(duration, vol=0.2) {
-                if (this.isMuted || !this.ctx) return;
-                const bufferSize = this.ctx.sampleRate * duration;
-                const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
-                const data = buffer.getChannelData(0);
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = Math.random() * 2 - 1;
-                }
-                const noise = this.ctx.createBufferSource();
-                noise.buffer = buffer;
-                const gain = this.ctx.createGain();
-                gain.gain.setValueAtTime(vol, this.ctx.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
-                noise.connect(gain);
-                gain.connect(this.ctx.destination);
-                noise.start();
-            },
-
-            // SFX Presets
-            click: function() { this.playTone(800, 'sine', 0.1, 0.05); },
-            roll: function() {
-                this.playNoise(0.08, 0.03);
-                setTimeout(() => this.playNoise(0.08, 0.03), 100);
-                setTimeout(() => this.playNoise(0.12, 0.02), 200);
-            },
-            win: function() {
-                this.playTone(523.25, 'triangle', 0.2);
-                setTimeout(() => this.playTone(659.25, 'triangle', 0.2), 150);
-                setTimeout(() => this.playTone(783.99, 'triangle', 0.4), 300);
-                setTimeout(() => this.playTone(1046.50, 'triangle', 0.6), 450);
-            },
-            lose: function() {
-                this.playTone(300, 'sawtooth', 0.3);
-                setTimeout(() => this.playTone(250, 'sawtooth', 0.3), 200);
-                setTimeout(() => this.playTone(150, 'sawtooth', 0.5), 400);
-            },
-            double: function() {
-                this.playTone(1200, 'square', 0.1, 0.1);
-                setTimeout(() => this.playTone(1200, 'square', 0.1, 0.1), 100);
-                setTimeout(() => this.playTone(1200, 'square', 0.3, 0.1), 200);
-            },
-            skip: function() {
-                this.playNoise(0.3, 0.05);
-                this.playTone(150, 'sine', 0.3, 0.1);
+        init: function() {
+            if (!this.ctx) {
+                this.ctx = new (window.AudioContext || window.webkitAudioContext)();
             }
-        };
+            if (this.ctx.state === 'suspended') {
+                this.ctx.resume();
+            }
+        },
 
-        function toggleMute() {
-            Sound.isMuted = !Sound.isMuted;
-            const btn = document.getElementById('soundToggle');
-            btn.innerHTML = Sound.isMuted ? '<i class="fas fa-volume-mute text-red-400"></i>' : '<i class="fas fa-volume-up"></i>';
-            Sound.click();
+        playTone: function(freq, type, duration, vol=0.1) {
+            if (this.isMuted || !this.ctx) return;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, this.ctx.currentTime);
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start();
+            osc.stop(this.ctx.currentTime + duration);
+        },
+
+        playNoise: function(duration, vol=0.2) {
+            if (this.isMuted || !this.ctx) return;
+            const bufferSize = this.ctx.sampleRate * duration;
+            const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+            const data = buffer.getChannelData(0);
+            for (let i = 0; i < bufferSize; i++) {
+                data[i] = Math.random() * 2 - 1;
+            }
+            const noise = this.ctx.createBufferSource();
+            noise.buffer = buffer;
+            const gain = this.ctx.createGain();
+            gain.gain.setValueAtTime(vol, this.ctx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + duration);
+            noise.connect(gain);
+            gain.connect(this.ctx.destination);
+            noise.start();
+        },
+
+        // SFX Presets
+        click: function() { this.playTone(800, 'sine', 0.1, 0.05); },
+        
+        roll: function() { 
+            // Rattle sound - Quieter and subtler
+            this.playNoise(0.08, 0.03); 
+            setTimeout(() => this.playNoise(0.08, 0.03), 100);
+            setTimeout(() => this.playNoise(0.12, 0.02), 200);
+        },
+        
+        win: function() {
+            this.playTone(523.25, 'triangle', 0.2); // C5
+            setTimeout(() => this.playTone(659.25, 'triangle', 0.2), 150); // E5
+            setTimeout(() => this.playTone(783.99, 'triangle', 0.4), 300); // G5
+            setTimeout(() => this.playTone(1046.50, 'triangle', 0.6), 450); // C6
+        },
+        lose: function() {
+            this.playTone(300, 'sawtooth', 0.3);
+            setTimeout(() => this.playTone(250, 'sawtooth', 0.3), 200);
+            setTimeout(() => this.playTone(150, 'sawtooth', 0.5), 400);
+        },
+        double: function() {
+            this.playTone(1200, 'square', 0.1, 0.1);
+            setTimeout(() => this.playTone(1200, 'square', 0.1, 0.1), 100);
+            setTimeout(() => this.playTone(1200, 'square', 0.3, 0.1), 200);
+        },
+        skip: function() {
+            this.playNoise(0.3, 0.05);
+            this.playTone(150, 'sine', 0.3, 0.1);
         }
+    };
 
-        // --- Game Config ---
-        const TARGET = 50;
-        const MAX_ROUNDS = 10;
-        const SKIP_THRESHOLD = 40;
+    function toggleMute() {
+        Sound.isMuted = !Sound.isMuted;
+        const btn = document.getElementById('soundToggle');
+        btn.innerHTML = Sound.isMuted ? '<i class="fas fa-volume-mute text-red-400"></i>' : '<i class="fas fa-volume-up"></i>';
+        Sound.click();
+    }
 
-        // --- State ---
-        let gameState = {
+
+    // --- Game Config ---
+    const TARGET = 50;
+    const MAX_ROUNDS = 10;
+    const SKIP_THRESHOLD = 40;
+    
+    // --- State ---
+    let gameState = {
+        round: 1,
+        pScore: 0,
+        cScore: 0,
+        pSkips: 2,
+        historyP: [],
+        historyC: [],
+        isPlayerTurn: true,
+        gameOver: false,
+        isProcessing: false // New flag to prevent spam clicking
+    };
+
+    // --- DOM Elements ---
+    const screens = {
+        menu: document.getElementById('menuScreen'),
+        rules: document.getElementById('rulesScreen'),
+        game: document.getElementById('gameScreen'),
+        stats: document.getElementById('statsScreen')
+    };
+
+    const ui = {
+        pScore: document.getElementById('pScore'),
+        cScore: document.getElementById('cScore'),
+        pSkips: document.getElementById('pSkips'),
+        round: document.getElementById('roundDisplay'),
+        indicator: document.getElementById('turnIndicator'),
+        die1: document.getElementById('die1'),
+        die2: document.getElementById('die2'),
+        btnRoll: document.getElementById('btnRoll'),
+        btnSkip: document.getElementById('btnSkip'),
+        log: document.getElementById('gameLog')
+    };
+
+    // --- Navigation ---
+    function switchScreen(name) {
+        Object.values(screens).forEach(s => s.classList.remove('active'));
+        screens[name].classList.add('active');
+        Sound.click();
+    }
+
+    function showMenu() { switchScreen('menu'); }
+    function showRules() { switchScreen('rules'); }
+
+    function startGame() {
+        Sound.init(); // Init Audio Context on user interaction
+        gameState = {
             round: 1,
             pScore: 0,
             cScore: 0,
@@ -484,72 +415,40 @@
             historyP: [],
             historyC: [],
             isPlayerTurn: true,
-            gameOver: false
+            gameOver: false,
+            isProcessing: false
         };
+        ui.log.innerHTML = ''; 
+        log("Battle Commencing...", "system");
+        updateUI();
+        Sound.win(); // Start jingle
+        switchScreen('game');
+    }
 
-        // --- DOM Elements ---
-        const screens = {
-            menu: document.getElementById('menuScreen'),
-            rules: document.getElementById('rulesScreen'),
-            game: document.getElementById('gameScreen'),
-            stats: document.getElementById('statsScreen')
-        };
+    // --- Core Logic ---
 
-        const ui = {
-            pScore: document.getElementById('pScore'),
-            cScore: document.getElementById('cScore'),
-            pSkips: document.getElementById('pSkips'),
-            round: document.getElementById('roundDisplay'),
-            indicator: document.getElementById('turnIndicator'),
-            die1: document.getElementById('die1'),
-            die2: document.getElementById('die2'),
-            btnRoll: document.getElementById('btnRoll'),
-            btnSkip: document.getElementById('btnSkip'),
-            log: document.getElementById('gameLog')
-        };
+    function updateUI() {
+        ui.pScore.innerText = gameState.pScore;
+        ui.cScore.innerText = gameState.cScore;
+        ui.pSkips.innerText = gameState.pSkips;
+        ui.round.innerText = `Round ${gameState.round}/${MAX_ROUNDS}`;
 
-        // --- Navigation ---
-        function switchScreen(name) {
-            Object.values(screens).forEach(s => s.classList.remove('active'));
-            screens[name].classList.add('active');
-            Sound.click();
-        }
-
-        function showMenu() { switchScreen('menu'); }
-        function showRules() { switchScreen('rules'); }
-
-        function startGame() {
-            Sound.init();
-            gameState = {
-                round: 1,
-                pScore: 0,
-                cScore: 0,
-                pSkips: 2,
-                historyP: [],
-                historyC: [],
-                isPlayerTurn: true,
-                gameOver: false
-            };
-            ui.log.innerHTML = '';
-            log("Battle Commencing...", "system");
-            updateUI();
-            Sound.win();
-            switchScreen('game');
-        }
-
-        // --- Core Logic ---
-        function updateUI() {
-            ui.pScore.innerText = gameState.pScore;
-            ui.cScore.innerText = gameState.cScore;
-            ui.pSkips.innerText = gameState.pSkips;
-            ui.round.innerText = `Round ${gameState.round}/${MAX_ROUNDS}`;
-
-            if (gameState.isPlayerTurn) {
-                ui.indicator.innerText = "Your Turn";
-                ui.indicator.className = "absolute top-4 bg-blue-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse";
+        // Turn Indicator
+        if (gameState.isPlayerTurn) {
+            ui.indicator.innerText = "Your Turn";
+            ui.indicator.className = "absolute top-4 bg-blue-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse";
+            
+            // Disable if processing
+            if(gameState.isProcessing) {
+                ui.btnRoll.disabled = true;
+                ui.btnRoll.classList.add('opacity-50', 'cursor-not-allowed');
+                ui.btnSkip.disabled = true;
+                ui.btnSkip.classList.add('bg-slate-600', 'text-slate-400', 'cursor-not-allowed');
+            } else {
                 ui.btnRoll.disabled = false;
                 ui.btnRoll.classList.remove('opacity-50', 'cursor-not-allowed');
-
+                
+                // Skip Logic
                 if (gameState.pScore >= SKIP_THRESHOLD && gameState.pSkips > 0) {
                     ui.btnSkip.disabled = false;
                     ui.btnSkip.classList.remove('bg-slate-600', 'text-slate-400', 'cursor-not-allowed');
@@ -558,241 +457,265 @@
                     ui.btnSkip.disabled = true;
                     ui.btnSkip.className = "bg-slate-600 text-slate-400 font-bold py-3 px-8 rounded-xl shadow-lg cursor-not-allowed transition w-32";
                 }
+            }
+
+        } else {
+            ui.indicator.innerText = "Computer's Turn";
+            ui.indicator.className = "absolute top-4 bg-red-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse";
+            ui.btnRoll.disabled = true;
+            ui.btnRoll.classList.add('opacity-50', 'cursor-not-allowed');
+            ui.btnSkip.disabled = true;
+            ui.btnSkip.className = "bg-slate-600 text-slate-400 font-bold py-3 px-8 rounded-xl shadow-lg cursor-not-allowed transition w-32";
+        }
+    }
+
+    function log(msg, type = "system") {
+        const div = document.createElement('div');
+        
+        let icon = 'fa-info-circle';
+        let classes = "log-entry log-system";
+
+        if (type === "player") {
+            classes = "log-entry log-player";
+            icon = "fa-user";
+        } else if (type === "computer") {
+            classes = "log-entry log-computer";
+            icon = "fa-robot";
+        } else if (type === "highlight") {
+            classes = "log-entry log-highlight";
+            icon = "fa-bolt";
+        } else if (type === "bad") {
+            classes = "log-entry log-bad";
+            icon = "fa-exclamation-triangle";
+        }
+
+        div.className = classes;
+        div.innerHTML = `<i class="fas ${icon} w-5 text-center opacity-75"></i> <span>${msg}</span>`;
+        ui.log.prepend(div);
+    }
+
+    function rollDiceAnim(callback) {
+        ui.die1.classList.add('roll-anim');
+        ui.die2.classList.add('roll-anim');
+        Sound.roll(); // Play sound
+        
+        let interval = setInterval(() => {
+            ui.die1.setAttribute('data-val', Math.ceil(Math.random()*6));
+            ui.die2.setAttribute('data-val', Math.ceil(Math.random()*6));
+        }, 50);
+
+        setTimeout(() => {
+            clearInterval(interval);
+            ui.die1.classList.remove('roll-anim');
+            ui.die2.classList.remove('roll-anim');
+            callback();
+        }, 500);
+    }
+
+    // --- Player Actions ---
+
+    function playerRoll() {
+        // Fix: Add check for isProcessing
+        if (!gameState.isPlayerTurn || gameState.gameOver || gameState.isProcessing) return;
+        gameState.isProcessing = true;
+        updateUI(); // Update UI to disable buttons
+        Sound.init();
+
+        rollDiceAnim(() => {
+            const d1 = Math.ceil(Math.random() * 6);
+            const d2 = Math.ceil(Math.random() * 6);
+            const sum = d1 + d2;
+
+            ui.die1.setAttribute('data-val', d1);
+            ui.die2.setAttribute('data-val', d2);
+
+            gameState.historyP.push(sum);
+            gameState.pScore += sum;
+            log(`Rolled <strong>${d1} + ${d2}</strong> (Sum: ${sum})`, "player");
+
+            // Double Penalty
+            if (d1 === d2) {
+                Sound.double();
+                log(`DOUBLE ${d1}'s! Computer loses 10 pts!`, "highlight");
+                gameState.cScore -= 10;
             } else {
-                ui.indicator.innerText = "Computer's Turn";
-                ui.indicator.className = "absolute top-4 bg-red-600 text-xs uppercase px-3 py-1 rounded-full font-bold shadow-lg animate-pulse";
-                ui.btnRoll.disabled = true;
-                ui.btnRoll.classList.add('opacity-50', 'cursor-not-allowed');
-                ui.btnSkip.disabled = true;
-                ui.btnSkip.className = "bg-slate-600 text-slate-400 font-bold py-3 px-8 rounded-xl shadow-lg cursor-not-allowed transition w-32";
-            }
-        }
-
-        function log(msg, type = "system") {
-            const div = document.createElement('div');
-            let icon = 'fa-info-circle';
-            let classes = "log-entry log-system";
-
-            if (type === "player") {
-                classes = "log-entry log-player";
-                icon = "fa-user";
-            } else if (type === "computer") {
-                classes = "log-entry log-computer";
-                icon = "fa-robot";
-            } else if (type === "highlight") {
-                classes = "log-entry log-highlight";
-                icon = "fa-bolt";
-            } else if (type === "bad") {
-                classes = "log-entry log-bad";
-                icon = "fa-exclamation-triangle";
+                Sound.click(); // Regular land sound
             }
 
-            div.className = classes;
-            div.innerHTML = `<i class="fas ${icon} w-5 text-center opacity-75"></i> <span>${msg}</span>`;
-            ui.log.prepend(div);
-        }
+            checkWinCondition(true);
+        });
+    }
 
-        function rollDiceAnim(callback) {
-            ui.die1.classList.add('roll-anim');
-            ui.die2.classList.add('roll-anim');
-            Sound.roll();
+    function playerSkip() {
+        if (!gameState.isPlayerTurn || gameState.gameOver || gameState.isProcessing) return;
+        gameState.isProcessing = true;
+        updateUI();
+        Sound.skip();
+        
+        gameState.pSkips--;
+        log(`Skipped turn. (${gameState.pSkips} remaining)`, "player");
+        endPlayerTurn();
+    }
 
-            let interval = setInterval(() => {
-                ui.die1.setAttribute('data-val', Math.ceil(Math.random()*6));
-                ui.die2.setAttribute('data-val', Math.ceil(Math.random()*6));
-            }, 50);
+    function endPlayerTurn() {
+        updateUI();
+        if (gameState.gameOver) return;
+        
+        gameState.isPlayerTurn = false;
+        gameState.isProcessing = false; // Reset processing for next phase
+        updateUI();
+        setTimeout(computerTurn, 1000);
+    }
 
-            setTimeout(() => {
-                clearInterval(interval);
-                ui.die1.classList.remove('roll-anim');
-                ui.die2.classList.remove('roll-anim');
-                callback();
-            }, 500);
-        }
+    // --- Computer Logic ---
 
-        // --- Player Actions ---
-        function playerRoll() {
-            if (!gameState.isPlayerTurn || gameState.gameOver) return;
-            Sound.init();
+    function computerTurn() {
+        if (gameState.gameOver) return;
 
-            rollDiceAnim(() => {
-                const d1 = Math.ceil(Math.random() * 6);
-                const d2 = Math.ceil(Math.random() * 6);
-                const sum = d1 + d2;
-
-                ui.die1.setAttribute('data-val', d1);
-                ui.die2.setAttribute('data-val', d2);
-
-                gameState.historyP.push(sum);
-                gameState.pScore += sum;
-
-                log(`Rolled <strong>${d1} + ${d2}</strong> (Sum: ${sum})`, "player");
-
-                if (d1 === d2) {
-                    Sound.double();
-                    log(`DOUBLE ${d1}'s! Computer loses 10 pts!`, "highlight");
-                    gameState.cScore -= 10;
-                } else {
-                    Sound.click();
-                }
-
-                checkWinCondition(true);
-            });
-        }
-
-        function playerSkip() {
-            if (!gameState.isPlayerTurn || gameState.gameOver) return;
+        // Skip Logic (30% chance if >= 40)
+        if (gameState.cScore >= SKIP_THRESHOLD && Math.random() < 0.3) {
             Sound.skip();
-            gameState.pSkips--;
-            log(`Skipped turn. (${gameState.pSkips} remaining)`, "player");
-            endPlayerTurn();
+            log("Decided to SKIP turn!", "computer");
+            endComputerTurn();
+            return;
         }
 
-        function endPlayerTurn() {
-            updateUI();
-            if (gameState.gameOver) return;
-            gameState.isPlayerTurn = false;
-            updateUI();
-            setTimeout(computerTurn, 1000);
-        }
+        rollDiceAnim(() => {
+            const d1 = Math.ceil(Math.random() * 6);
+            const d2 = Math.ceil(Math.random() * 6);
+            const sum = d1 + d2;
 
-        // --- Computer Logic ---
-        function computerTurn() {
-            if (gameState.gameOver) return;
+            ui.die1.setAttribute('data-val', d1);
+            ui.die2.setAttribute('data-val', d2);
 
-            if (gameState.cScore >= SKIP_THRESHOLD && Math.random() < 0.3) {
-                Sound.skip();
-                log("Decided to SKIP turn!", "computer");
-                endComputerTurn();
-                return;
-            }
+            gameState.historyC.push(sum);
+            gameState.cScore += sum;
+            log(`Rolled <strong>${d1} + ${d2}</strong> (Sum: ${sum})`, "computer");
 
-            rollDiceAnim(() => {
-                const d1 = Math.ceil(Math.random() * 6);
-                const d2 = Math.ceil(Math.random() * 6);
-                const sum = d1 + d2;
-
-                ui.die1.setAttribute('data-val', d1);
-                ui.die2.setAttribute('data-val', d2);
-
-                gameState.historyC.push(sum);
-                gameState.cScore += sum;
-
-                log(`Rolled <strong>${d1} + ${d2}</strong> (Sum: ${sum})`, "computer");
-
-                if (d1 === d2) {
-                    Sound.double();
-                    log(`ROLLED DOUBLES! You lose 10 pts!`, "bad");
-                    gameState.pScore -= 10;
-                } else {
-                    Sound.click();
-                }
-
-                checkWinCondition(false);
-            });
-        }
-
-        function endComputerTurn() {
-            updateUI();
-            if (gameState.gameOver) return;
-            gameState.round++;
-            if (gameState.round > MAX_ROUNDS) {
-                endGame("limit");
+            if (d1 === d2) {
+                Sound.double();
+                log(`ROLLED DOUBLES! You lose 10 pts!`, "bad");
+                gameState.pScore -= 10;
             } else {
-                gameState.isPlayerTurn = true;
-                updateUI();
+                Sound.click();
             }
-        }
 
-        // --- Win/Loss Logic ---
-        function checkWinCondition(wasPlayer) {
+            checkWinCondition(false);
+        });
+    }
+
+    function endComputerTurn() {
+        updateUI();
+        if (gameState.gameOver) return;
+
+        gameState.round++;
+        if (gameState.round > MAX_ROUNDS) {
+            endGame("limit");
+        } else {
+            gameState.isPlayerTurn = true;
             updateUI();
-
-            if (gameState.pScore === TARGET) return endGame("playerWin", "Hit 50 exactly!");
-            if (gameState.pScore > TARGET) return endGame("playerBust", "You went over 50!");
-
-            if (gameState.cScore === TARGET) return endGame("compWin", "Computer hit 50!");
-            if (gameState.cScore > TARGET) return endGame("compBust", "Computer went over 50!");
-
-            if (wasPlayer) endPlayerTurn();
-            else endComputerTurn();
         }
+    }
 
-        function calculateStats(arr) {
-            if (arr.length === 0) return { min: 0, max: 0, avg: "0.00" };
-            return {
-                min: Math.min(...arr),
-                max: Math.max(...arr),
-                avg: (arr.reduce((a,b)=>a+b,0) / arr.length).toFixed(2)
-            };
-        }
+    // --- Win/Loss Logic ---
 
-        function endGame(reason, msg = "") {
-            gameState.gameOver = true;
-            switchScreen('stats');
+    function checkWinCondition(wasPlayer) {
+        updateUI();
 
-            const winTitle = document.getElementById('winnerText');
-            const winSub = document.getElementById('winnerSub');
-            const pFinal = document.getElementById('finalPScore');
-            const cFinal = document.getElementById('finalCScore');
+        // 1. Instant Win/Loss Player
+        if (gameState.pScore === TARGET) return endGame("playerWin", "Hit 50 exactly!");
+        if (gameState.pScore > TARGET) return endGame("playerBust", "You went over 50!");
 
-            pFinal.innerText = gameState.pScore;
-            cFinal.innerText = gameState.cScore;
+        // 2. Instant Win/Loss Computer
+        if (gameState.cScore === TARGET) return endGame("compWin", "Computer hit 50!");
+        if (gameState.cScore > TARGET) return endGame("compBust", "Computer went over 50!");
 
-            let playerWon = false;
+        // Continue
+        if (wasPlayer) endPlayerTurn();
+        else endComputerTurn();
+    }
 
-            if (reason === "limit") {
-                const distP = Math.abs(TARGET - gameState.pScore);
-                const distC = Math.abs(TARGET - gameState.cScore);
+    function calculateStats(arr) {
+        if (arr.length === 0) return { min: 0, max: 0, avg: "0.00" };
+        return {
+            min: Math.min(...arr),
+            max: Math.max(...arr),
+            avg: (arr.reduce((a,b)=>a+b,0) / arr.length).toFixed(2)
+        };
+    }
 
-                if (gameState.pScore > TARGET && gameState.cScore > TARGET) {
-                    winTitle.innerText = "NO WINNER";
-                    winSub.innerText = "Both players busted.";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-slate-400";
-                } else if (gameState.pScore > TARGET) {
-                    winTitle.innerText = "COMPUTER WINS";
-                    winSub.innerText = "You busted over 50.";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
-                } else if (gameState.cScore > TARGET) {
-                    playerWon = true;
-                    winTitle.innerText = "YOU WIN!";
-                    winSub.innerText = "Computer busted over 50.";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
-                } else if (distP < distC) {
-                    playerWon = true;
-                    winTitle.innerText = "YOU WIN!";
-                    winSub.innerText = `Closest to 50 (Diff: ${distP})`;
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
-                } else if (distC < distP) {
-                    winTitle.innerText = "COMPUTER WINS";
-                    winSub.innerText = `Closest to 50 (Diff: ${distC})`;
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
-                } else {
-                    winTitle.innerText = "IT'S A TIE!";
-                    winSub.innerText = "Equal distance to 50.";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-yellow-500";
-                }
+    function endGame(reason, msg = "") {
+        gameState.gameOver = true;
+        switchScreen('stats');
+
+        const winTitle = document.getElementById('winnerText');
+        const winSub = document.getElementById('winnerSub');
+        const pFinal = document.getElementById('finalPScore');
+        const cFinal = document.getElementById('finalCScore');
+
+        pFinal.innerText = gameState.pScore;
+        cFinal.innerText = gameState.cScore;
+        
+        // Determine Winner for Sound
+        let playerWon = false;
+
+        if (reason === "limit") {
+            // Distance Check
+            const distP = Math.abs(TARGET - gameState.pScore);
+            const distC = Math.abs(TARGET - gameState.cScore);
+            
+            if (gameState.pScore > TARGET && gameState.cScore > TARGET) {
+                 winTitle.innerText = "NO WINNER";
+                 winSub.innerText = "Both players busted.";
+                 winTitle.className = "text-3xl font-bold text-center mb-2 text-slate-400";
+            } else if (gameState.pScore > TARGET) {
+                winTitle.innerText = "COMPUTER WINS";
+                winSub.innerText = "You busted over 50.";
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
+            } else if (gameState.cScore > TARGET) {
+                playerWon = true;
+                winTitle.innerText = "YOU WIN!";
+                winSub.innerText = "Computer busted over 50.";
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
+            } else if (distP < distC) {
+                playerWon = true;
+                winTitle.innerText = "YOU WIN!";
+                winSub.innerText = `Closest to 50 (Diff: ${distP})`;
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
+            } else if (distC < distP) {
+                winTitle.innerText = "COMPUTER WINS";
+                winSub.innerText = `Closest to 50 (Diff: ${distC})`;
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
             } else {
-                if (reason === "playerWin" || reason === "compBust") {
-                    playerWon = true;
-                    winTitle.innerText = "YOU WIN!";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
-                } else {
-                    winTitle.innerText = "COMPUTER WINS";
-                    winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
-                }
-                winSub.innerText = msg;
+                winTitle.innerText = "IT'S A TIE!";
+                winSub.innerText = "Equal distance to 50.";
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-yellow-500";
             }
-
-            if (playerWon) Sound.win();
-            else Sound.lose();
-
-            const pStats = calculateStats(gameState.historyP);
-            const cStats = calculateStats(gameState.historyC);
-            document.getElementById('pStats').innerText = `Min: ${pStats.min} | Max: ${pStats.max} | Avg: ${pStats.avg}`;
-            document.getElementById('cStats').innerText = `Min: ${cStats.min} | Max: ${cStats.max} | Avg: ${cStats.avg}`;
+        } else {
+            // Instant Ends
+            if (reason === "playerWin" || reason === "compBust") {
+                playerWon = true;
+                winTitle.innerText = "YOU WIN!";
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-green-500";
+            } else {
+                winTitle.innerText = "COMPUTER WINS";
+                winTitle.className = "text-3xl font-bold text-center mb-2 text-red-500";
+            }
+            winSub.innerText = msg;
         }
-    </script>
 
+        // Play Sound
+        if (playerWon) Sound.win();
+        else Sound.lose();
+
+        // Stats Display
+        const pStats = calculateStats(gameState.historyP);
+        const cStats = calculateStats(gameState.historyC);
+        
+        document.getElementById('pStats').innerText = `Min: ${pStats.min} | Max: ${pStats.max} | Avg: ${pStats.avg}`;
+        document.getElementById('cStats').innerText = `Min: ${cStats.min} | Max: ${cStats.max} | Avg: ${cStats.avg}`;
+    }
+
+</script>
 </body>
 </html>
